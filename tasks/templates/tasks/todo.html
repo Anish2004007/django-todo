@@ -2,31 +2,102 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>My To-Do List</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-    <link rel="stylesheet" href="{% static 'tasks/style.css' %}">
+    <title>TaskFlow</title>
+
+    <link
+        rel="stylesheet"
+        href="{% static 'tasks/style.css' %}"
+    >
+
 </head>
 
 <body>
 
-    <div class="container">
+    <!-- Background decorations -->
+    <div class="orb orb-one"></div>
+    <div class="orb orb-two"></div>
+    <div class="orb orb-three"></div>
 
-        <h1>My To-Do List</h1>
+
+    <main class="app-container">
+
+        <!-- Header -->
+
+        <header class="app-header">
+
+            <div class="brand">
+
+                <div class="brand-icon">
+                    ✓
+                </div>
+
+                <div>
+
+                    <p class="brand-name">
+                        TaskFlow
+                    </p>
+
+                    <p class="brand-subtitle">
+                        Organize your day
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="task-badge">
+
+                <span class="task-number">
+                    {{ tasks|length }}
+                </span>
+
+                <span class="task-label">
+                    Tasks
+                </span>
+
+            </div>
+
+        </header>
+
+
+        <!-- Welcome -->
+
+        <section class="welcome">
+
+            <p class="welcome-small">
+                YOUR PRODUCTIVITY SPACE
+            </p>
+
+            <h1>
+                My To-Do List
+            </h1>
+
+            <p class="welcome-text">
+                Plan your tasks. Stay focused. Get things done.
+            </p>
+
+        </section>
+
 
         <!-- Add Task -->
-        <form method="POST" class="add-form">
-            {% csrf_token %}
 
-            <input
-                type="text"
-                name="task"
-                placeholder="What do you need to do?"
-                required
-            >
+        <form
+            method="POST"
+            class="add-task"
+        >
+
+            {% csrf_token %}
 
             <input
                 type="hidden"
@@ -34,128 +105,275 @@
                 value="add"
             >
 
-            <button type="submit" class="add-btn">
-                Add
-            </button>
-        </form>
+            <div class="input-wrapper">
 
+                <span class="input-icon">
+                    +
+                </span>
 
-        <!-- Task List -->
-        <ul class="task-list">
+                <input
+                    type="text"
+                    name="task"
+                    placeholder="What needs to be done?"
+                    autocomplete="off"
+                    required
+                >
 
-            {% for task in tasks %}
+            </div>
 
-                <li class="task">
-
-                    <span class="task-text {% if task.completed %}completed{% endif %}">
-                        {{ task.text }}
-                    </span>
-<div class="actions">
-
-    <!-- Complete -->
-    {% if not task.completed %}
-
-        <form method="POST">
-            {% csrf_token %}
-
-            <input
-                type="hidden"
-                name="action"
-                value="complete"
-            >
-
-            <input
-                type="hidden"
-                name="index"
-                value="{{ forloop.counter0 }}"
-            >
 
             <button
                 type="submit"
-                class="complete-btn"
+                class="add-button"
             >
-                ✓
+
+                <span>+</span>
+
+                Add Task
+
             </button>
+
         </form>
 
-    {% endif %}
+
+        <!-- Tasks -->
+
+        <section class="tasks-section">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <h2>
+                        Your Tasks
+                    </h2>
+
+                    <p>
+                        Keep moving forward
+                    </p>
+
+                </div>
+
+                <div class="task-count-label">
+                    {{ tasks|length }} total
+                </div>
+
+            </div>
 
 
-    <!-- Edit -->
-    <form method="POST" class="edit-form">
+            <div class="task-list">
 
-        {% csrf_token %}
+                {% for task in tasks %}
 
-        <input
-            type="hidden"
-            name="action"
-            value="edit"
-        >
+                <article
+                    class="task-card
+                    {% if task.completed %}
+                        completed-task
+                    {% endif %}"
+                >
 
-        <input
-            type="hidden"
-            name="index"
-            value="{{ forloop.counter0 }}"
-        >
+                    <!-- Status -->
 
-        <input
-            type="text"
-            name="task"
-            value="{{ task.text }}"
-            class="edit-input"
-        >
+                    <div class="status-circle">
 
-        <button
-            type="submit"
-            class="edit-btn"
-        >
-            ✏️
-        </button>
+                        {% if task.completed %}
 
-    </form>
+                            ✓
+
+                        {% else %}
+
+                            <span></span>
+
+                        {% endif %}
+
+                    </div>
 
 
-    <!-- Delete -->
-    <form method="POST">
+                    <!-- Task text -->
 
-        {% csrf_token %}
+                    <div class="task-info">
 
-        <input
-            type="hidden"
-            name="action"
-            value="delete"
-        >
+                        <div class="task-title">
+                            {{ task.text }}
+                        </div>
 
-        <input
-            type="hidden"
-            name="index"
-            value="{{ forloop.counter0 }}"
-        >
+                        {% if task.completed %}
 
-        <button
-            type="submit"
-            class="delete-btn"
-        >
-            ✕
-        </button>
+                            <div class="task-status completed-label">
+                                Completed
+                            </div>
 
-    </form>
+                        {% else %}
 
-</div>
+                            <div class="task-status">
+                                In progress
+                            </div>
 
-                </li>
+                        {% endif %}
 
-            {% empty %}
+                    </div>
 
-                <p class="empty-message">
-                    No tasks yet. Add your first task!
-                </p>
 
-            {% endfor %}
+                    <!-- Actions -->
 
-        </ul>
+                    <div class="task-actions">
 
-    </div>
+
+                        {% if not task.completed %}
+
+                        <!-- Complete -->
+
+                        <form method="POST">
+
+                            {% csrf_token %}
+
+                            <input
+                                type="hidden"
+                                name="action"
+                                value="complete"
+                            >
+
+                            <input
+                                type="hidden"
+                                name="index"
+                                value="{{ forloop.counter0 }}"
+                            >
+
+                            <button
+                                type="submit"
+                                class="icon-button complete"
+                                title="Complete"
+                            >
+                                ✓
+                            </button>
+
+                        </form>
+
+                        {% endif %}
+
+
+                        <!-- Edit -->
+
+                        <form
+                            method="POST"
+                            class="edit-form"
+                        >
+
+                            {% csrf_token %}
+
+                            <input
+                                type="hidden"
+                                name="action"
+                                value="edit"
+                            >
+
+                            <input
+                                type="hidden"
+                                name="index"
+                                value="{{ forloop.counter0 }}"
+                            >
+
+                            <input
+                                type="text"
+                                name="task"
+                                value="{{ task.text }}"
+                                class="edit-input"
+                            >
+
+                            <button
+                                type="submit"
+                                class="icon-button edit"
+                                title="Save edit"
+                            >
+                                ✎
+                            </button>
+
+                        </form>
+
+
+                        <!-- Delete -->
+
+                        <form method="POST">
+
+                            {% csrf_token %}
+
+                            <input
+                                type="hidden"
+                                name="action"
+                                value="delete"
+                            >
+
+                            <input
+                                type="hidden"
+                                name="index"
+                                value="{{ forloop.counter0 }}"
+                            >
+
+                            <button
+                                type="submit"
+                                class="icon-button delete"
+                                title="Delete"
+                            >
+                                ×
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </article>
+
+                {% empty %}
+
+
+                <!-- Empty state -->
+
+                <div class="empty-state">
+
+                    <div class="empty-illustration">
+
+                        <div class="empty-check">
+                            ✓
+                        </div>
+
+                    </div>
+
+                    <h3>
+                        You're all caught up!
+                    </h3>
+
+                    <p>
+                        Add a task above and start making progress.
+                    </p>
+
+                </div>
+
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+
+        <!-- Footer -->
+
+        <footer>
+
+            <span>
+                ✦
+            </span>
+
+            Stay focused. Stay productive.
+
+            <span>
+                ✦
+            </span>
+
+        </footer>
+
+    </main>
 
 </body>
+
 </html>
